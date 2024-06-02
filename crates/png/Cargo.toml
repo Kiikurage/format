@@ -1,0 +1,12 @@
+[package]
+name = "png"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "png"
+path = "src/lib.rs"
+
+[dependencies]
+flate2 = "1.0.30"
+fltk = "1.4.30"

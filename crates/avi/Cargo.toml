@@ -1,0 +1,9 @@
+[package]
+name = "avi"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+riff = { path = "../riff" }
+bmp = { path = "../bmp" }
+

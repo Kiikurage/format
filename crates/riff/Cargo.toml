@@ -1,0 +1,15 @@
+[package]
+name = "riff"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "riff"
+path = "src/lib.rs"
+
+[[bin]]
+name = "riff"
+path = "src/bin.rs"
+
+[dependencies]
+clap = { version = "4.5.4", features = ["derive"] }
