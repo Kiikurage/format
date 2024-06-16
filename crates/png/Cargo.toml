@@ -8,5 +8,5 @@ name = "png"
 path = "src/lib.rs"
 
 [dependencies]
-flate2 = "1.0.30"
 fltk = "1.4.30"
+zlib = { path = "../zlib" }

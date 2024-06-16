@@ -4,8 +4,6 @@ use std::io::{Error, Read};
 use std::mem::{size_of, transmute};
 use std::os::unix::fs::FileExt;
 
-use flate2::read::ZlibDecoder;
-
 #[derive(Default)]
 pub struct Png {
     pub width: usize,
@@ -112,19 +110,16 @@ fn decode_image_data(
     height: usize,
     bit_depth: usize,
 ) -> Result<Box<[u8]>, Error> {
-    let mut zlib_decoder = ZlibDecoder::new(&zlib_compressed[..]);
-    let mut inflated = Vec::new();
-    zlib_decoder.read_to_end(&mut inflated).unwrap();
-
+    let inflated = zlib::zlib::inflate(&zlib_compressed[..])?;
     let byte_per_pixel = bit_depth / 8 * 3; // TODO;
     let byte_per_line = width * byte_per_pixel;
 
     let mut data = vec![0u8; height * byte_per_line];
-    for y in 0..height as usize {
+    for y in 0..height {
         let filter_type = inflated[y * (1 + byte_per_line)];
 
-        for x in 0..width as usize {
-            for i in 0..3 as usize {
+        for x in 0..width {
+            for i in 0..3 {
                 let filt_x = inflated[y * (1 + byte_per_line) + 1 + x * byte_per_pixel + i];
                 let recon_a = if x == 0 {
                     0u8
