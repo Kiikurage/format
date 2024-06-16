@@ -129,7 +129,7 @@ fn parse_chunk(file: &mut File, mut offset: usize) -> Result<Chunk, std::io::Err
             (parse_chunk_list(file, offset, size - 4)?, Vec::new())
         }
         _ => {
-            let mut buf = vec![0u8; size as usize];
+            let mut buf = vec![0u8; size];
             file.read_at(&mut buf, offset as u64)?;
             (Vec::new(), buf)
         }

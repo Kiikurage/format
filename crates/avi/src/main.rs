@@ -6,13 +6,13 @@ use std::io::{Error, Write};
 fn main() -> Result<(), Error> {
     let avih = AVIHeader {
         micro_sec_per_frame: 1e6 as u32,
-        max_bytes_per_sec: 1 * 1024 * 1024,
+        max_bytes_per_sec: 1024 * 1024,
         padding_granularity: 0,
         flags: 0,
         total_frames: 10,
         initial_frames: 0,
         streams: 1,
-        suggested_buffer_size: 1 * 1024 * 1024,
+        suggested_buffer_size: 1024 * 1024,
         width: 640,
         height: 426,
         reserved: [0, 0, 0, 0],
@@ -29,7 +29,7 @@ fn main() -> Result<(), Error> {
         rate: 1,
         start: 0,
         length: 10,
-        suggested_buffer_size: 1 * 1024 * 1024,
+        suggested_buffer_size: 1024 * 1024,
         quality: 0,
         sample_size: 0,
         frame_left: 0,
@@ -144,9 +144,9 @@ struct AVIOldIndex {
     size: u32,
 }
 
-const AVIIF_LIST: u32 = 0x1;
+// const AVIIF_LIST: u32 = 0x1;
 const AVIIF_KEYFRAME: u32 = 0x10;
-const AVIIF_COMPRESSOR: u32 = 0x100;
+// const AVIIF_COMPRESSOR: u32 = 0x100;
 
 /// https://learn.microsoft.com/en-us/previous-versions/ms779638(v=vs.85)
 #[repr(C, packed)]

@@ -151,9 +151,9 @@ mod test {
         let huffman = HuffmanTable::from_code_lengths(&lengths);
         let codes = [0b11011010, 0b1];
 
-        assert_eq!(huffman.decode(&codes, 0), (0, 1));
-        assert_eq!(huffman.decode(&codes, 1), (1, 3));
-        assert_eq!(huffman.decode(&codes, 3), (2, 6));
-        assert_eq!(huffman.decode(&codes, 6), (3, 9));
+        assert_eq!(huffman.decode(&codes, 0).unwrap(), (0, 1));
+        assert_eq!(huffman.decode(&codes, 1).unwrap(), (1, 3));
+        assert_eq!(huffman.decode(&codes, 3).unwrap(), (2, 6));
+        assert_eq!(huffman.decode(&codes, 6).unwrap(), (3, 9));
     }
 }

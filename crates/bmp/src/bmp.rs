@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::io::{Error, ErrorKind, Seek};
+use std::io::{Error, ErrorKind};
 use std::mem::size_of;
 use std::os::unix::fs::FileExt;
 use std::path::Path;

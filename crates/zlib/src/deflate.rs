@@ -90,16 +90,6 @@ fn inflate_static_block(
         } else if literal_or_length_code == 256 {
             break;
         } else {
-            const LENGTH_EXTRA_BITS: [usize; 29] = [
-                0, 0, 0, 0, 0, 0, 0, 0, 1, 1, // 257-266
-                1, 1, 2, 2, 2, 2, 3, 3, 3, 3, // 267-276
-                4, 4, 4, 4, 5, 5, 5, 5, 0, // 277-285
-            ];
-            const LENGTH_BASE: [usize; 29] = [
-                3, 4, 5, 6, 7, 8, 9, 10, 11, 13, // 257-266
-                15, 17, 19, 23, 27, 31, 35, 43, 51, 59, // 267-276
-                67, 83, 99, 115, 131, 163, 195, 227, 258, // 277-285
-            ];
             let extra_bits = LENGTH_EXTRA_BITS[literal_or_length_code as usize - 257];
             let length = read_bits(compressed, bit_offset, extra_bits as u8)
                 + LENGTH_BASE[literal_or_length_code as usize - 257];
@@ -108,17 +98,7 @@ fn inflate_static_block(
             let distance_code = read_bits(compressed, bit_offset, 5);
             bit_offset += 5;
 
-            const DISTANCE_EXTRA_BITS: [usize; 30] = [
-                0, 0, 0, 0, 1, 1, 2, 2, 3, 3, // 0-9
-                4, 4, 5, 5, 6, 6, 7, 7, 8, 8, // 10-19
-                9, 9, 10, 10, 11, 11, 12, 12, 13, 13, // 20-29
-            ];
-            const DISTANCE_BASE: [usize; 30] = [
-                1, 2, 3, 4, 5, 7, 9, 13, 17, 25, // 0-9
-                33, 49, 65, 97, 129, 193, 257, 385, 513, 769, // 10-19
-                1025, 1537, 2049, 3073, 4097, 6145, 8193, 12289, 16385, 24577, // 20-29
-            ];
-            let extra_bits = DISTANCE_EXTRA_BITS[distance_code as usize];
+            let extra_bits = DISTANCE_EXTRA_BITS[distance_code];
             let distance =
                 read_bits(compressed, bit_offset, extra_bits as u8) + DISTANCE_BASE[distance_code];
             bit_offset += extra_bits;
@@ -147,14 +127,10 @@ fn inflate_dynamic_block(
     bit_offset += 4;
 
     let mut code_length_code_lengths = HashMap::new();
-    for i in 0..code_length_codes_count {
+    for &code_length in &CODE_LENGTH_ORDER[..code_length_codes_count] {
         let code_length_code_length = read_bits(compressed, bit_offset, 3) as u8;
         bit_offset += 3;
-
-        if code_length_code_length == 0 {
-            continue;
-        }
-        code_length_code_lengths.insert(CODE_LENGTH_ORDER[i], code_length_code_length);
+        code_length_code_lengths.insert(code_length, code_length_code_length);
     }
     let code_length_huffman = HuffmanTable::from_code_lengths(&code_length_code_lengths);
 
@@ -193,14 +169,14 @@ fn inflate_dynamic_block(
     }
 
     let mut literal_code_lengths = HashMap::new();
-    for i in 0..literal_codes_count {
-        literal_code_lengths.insert(i as u16, code_lengths[i]);
+    for (value, &code_length) in code_lengths[..literal_codes_count].iter().enumerate() {
+        literal_code_lengths.insert(value as u16, code_length);
     }
     let literal_codes_huffman = HuffmanTable::from_code_lengths(&literal_code_lengths);
 
     let mut distance_code_lengths = HashMap::new();
-    for i in 0..distance_codes_count {
-        distance_code_lengths.insert(i as u16, code_lengths[literal_codes_count + i]);
+    for (value, &code_length) in code_lengths[literal_codes_count..].iter().enumerate() {
+        distance_code_lengths.insert(value as u16, code_length);
     }
     let distance_codes_huffman = HuffmanTable::from_code_lengths(&distance_code_lengths);
 

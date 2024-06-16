@@ -1,6 +1,6 @@
 use std::fs::File;
+use std::io::Error;
 use std::io::ErrorKind::InvalidData;
-use std::io::{Error, Read};
 use std::mem::{size_of, transmute};
 use std::os::unix::fs::FileExt;
 
@@ -16,7 +16,6 @@ pub struct Chunk {
     length: u32,
     chunk_type: [u8; 4],
     data: Vec<u8>,
-    crc: u32,
 }
 
 impl Chunk {
@@ -32,14 +31,10 @@ impl Chunk {
         let mut data = vec![0u8; length as usize];
         file.read_at(&mut data, offset + 8)?;
 
-        file.read_at(&mut buf4, offset + 8 + length as u64)?;
-        let crc = u32::from_be_bytes(buf4);
-
         Ok(Chunk {
             length,
             chunk_type,
             data,
-            crc,
         })
     }
 }
